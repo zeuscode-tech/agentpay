@@ -53,6 +53,18 @@ pnpm dev:api
 The health endpoint is available at `http://127.0.0.1:4021/health`. The paid
 summarizer is exposed as `POST http://127.0.0.1:4021/v1/tools/summarize`.
 
+Start the web app in another terminal:
+
+```bash
+pnpm dev:web
+```
+
+Open `http://127.0.0.1:3000`, connect a Solana Devnet wallet, paste text, and
+approve the exact x402 payment. The browser client uses the wallet's Solana Kit
+signer and rejects payment requirements with an unexpected network, token,
+amount, or receiver. For the custom-token fallback, the connected wallet must
+first be funded with that test token.
+
 ### Current x402 smoke test
 
 Create disposable Devnet-only payer and receiver wallets:
