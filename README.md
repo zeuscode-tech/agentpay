@@ -2,7 +2,10 @@
 
 AgentPay is a pay-per-request AI tools platform for developers and autonomous agents, powered by x402 and Solana.
 
-The hackathon MVP focuses on one complete flow: a client requests an AI summarization resource, receives an HTTP `402 Payment Required` challenge, settles a USDC payment on Solana Devnet, and receives the protected result only after successful payment verification.
+The hackathon MVP focuses on one complete flow: a client requests a text
+summarization resource, receives an HTTP `402 Payment Required` challenge,
+settles a token payment on Solana Devnet, and receives the protected result only
+after successful payment verification.
 
 ## Status
 
@@ -47,7 +50,8 @@ Start the API:
 pnpm dev:api
 ```
 
-The initial health endpoint is available at `http://127.0.0.1:4021/health`.
+The health endpoint is available at `http://127.0.0.1:4021/health`. The paid
+summarizer is exposed as `POST http://127.0.0.1:4021/v1/tools/summarize`.
 
 ### Current x402 smoke test
 
@@ -90,6 +94,14 @@ pnpm agent:pay
 The client accepts only x402 V2 `exact` requirements for Solana Devnet, the
 official Devnet USDC mint, the configured receiver, and a maximum of `0.01
 USDC` per request.
+
+The API validates summarizer input before issuing a payment challenge. This
+prevents malformed requests from being charged. In the default
+`AI_SUMMARIZER_MODE=local` mode it uses a deterministic extractive NLP model, so
+the complete payment flow works without an external AI key. Set
+`AI_SUMMARIZER_MODE=gateway` and provide `AI_GATEWAY_API_KEY` to use the model
+named by `AI_GATEWAY_MODEL` through Vercel AI Gateway instead. Never commit that
+key.
 
 ### Devnet faucet fallback
 

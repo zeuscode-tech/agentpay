@@ -9,6 +9,13 @@ import {
   SOLANA_NETWORK,
 } from "@agentpay/config";
 
+import {
+  createSummarizer,
+  summaryRequestSchema,
+  type Summarizer,
+  type SummaryRequest,
+} from "./summarizer.js";
+
 export type PaymentConfig = {
   facilitatorUrl: string;
   payTo: string;
@@ -24,7 +31,10 @@ export function getHealthStatus() {
   } as const;
 }
 
-export function createApp(paymentConfig?: PaymentConfig): Express {
+export function createApp(
+  paymentConfig?: PaymentConfig,
+  summarizer: Summarizer = createSummarizer(),
+): Express {
   const app = express();
 
   app.disable("x-powered-by");
@@ -67,6 +77,24 @@ export function createApp(paymentConfig?: PaymentConfig): Express {
       new ExactSvmScheme(),
     );
 
+    app.post("/v1/tools/summarize", (request, response, next) => {
+      const parsed = summaryRequestSchema.safeParse(request.body);
+
+      if (!parsed.success) {
+        response.status(400).json({
+          error: "invalid_summary_request",
+          details: parsed.error.issues.map(issue => ({
+            path: issue.path.join("."),
+            message: issue.message,
+          })),
+        });
+        return;
+      }
+
+      response.locals.summaryRequest = parsed.data;
+      next();
+    });
+
     app.use(
       paymentMiddleware(
         {
@@ -82,6 +110,18 @@ export function createApp(paymentConfig?: PaymentConfig): Express {
             description: "AgentPay protected service status",
             mimeType: "application/json",
           },
+          "POST /v1/tools/summarize": {
+            accepts: [
+              {
+                scheme: "exact",
+                price: paymentPrice,
+                network: SOLANA_NETWORK,
+                payTo: paymentConfig.payTo,
+              },
+            ],
+            description: "Summarize text after an x402 payment",
+            mimeType: "application/json",
+          },
         },
         resourceServer,
       ),
@@ -94,6 +134,18 @@ export function createApp(paymentConfig?: PaymentConfig): Express {
         protocol: "x402-v2",
         network: SOLANA_NETWORK,
         asset: paymentAsset,
+      });
+    });
+
+    app.post("/v1/tools/summarize", async (_request, response) => {
+      const summaryRequest = response.locals.summaryRequest as SummaryRequest;
+      const result = await summarizer.summarize(summaryRequest);
+
+      response.json({
+        tool: "text-summarizer",
+        ...result,
+        inputCharacters: summaryRequest.text.length,
+        outputCharacters: result.summary.length,
       });
     });
   }
