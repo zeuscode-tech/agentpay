@@ -5,14 +5,20 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "dev": "tsx watch src/server.ts",
-    "start": "node dist/src/server.js",
+    "dev": "tsx watch --env-file-if-exists=../../.env src/server.ts",
+    "start": "node --env-file-if-exists=../../.env dist/src/server.js",
     "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "wallets:setup": "tsx scripts/setup-dev-wallets.ts"
   },
   "dependencies": {
     "@agentpay/config": "workspace:*",
-    "express": "^5.3.0"
+    "@solana/kit": "^8.5.0",
+    "@x402/core": "^2.28.0",
+    "@x402/express": "^2.28.0",
+    "@x402/svm": "^2.28.0",
+    "express": "^5.3.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/express": "^5.0.6"

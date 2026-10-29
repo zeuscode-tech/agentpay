@@ -12,7 +12,8 @@
     "build": "pnpm --recursive build",
     "dev:api": "pnpm --filter @agentpay/api dev",
     "test": "pnpm --recursive test",
-    "typecheck": "pnpm --filter @agentpay/config build && pnpm --recursive typecheck"
+    "typecheck": "pnpm --filter @agentpay/config build && pnpm --recursive typecheck",
+    "wallets:setup": "pnpm --filter @agentpay/api wallets:setup"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",

@@ -49,6 +49,30 @@ pnpm dev:api
 
 The initial health endpoint is available at `http://127.0.0.1:4021/health`.
 
+### Current x402 smoke test
+
+Create disposable Devnet-only payer and receiver wallets:
+
+```bash
+pnpm wallets:setup
+```
+
+Copy the printed receiver address to `SOLANA_PAY_TO` in a local `.env` file,
+then start the API and request the protected resource without a payment:
+
+```bash
+pnpm dev:api
+curl -i http://127.0.0.1:4021/v1/protected/status
+```
+
+The request must return HTTP `402` with a `PAYMENT-REQUIRED` header containing
+an x402 V2 `exact` payment requirement for `0.001 USDC` on Solana Devnet. The
+protected resource is not returned until the facilitator verifies and settles a
+valid payment.
+
+Disposable wallet files are stored under `.local/wallets` and are ignored by
+Git. Never use these development wallets on Mainnet.
+
 ## Security
 
 Never commit wallet private keys, seed phrases, API keys, or populated `.env` files. Development uses disposable Devnet-only wallets.
