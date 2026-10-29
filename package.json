@@ -10,6 +10,7 @@
   "packageManager": "pnpm@11.25.0",
   "scripts": {
     "build": "pnpm --recursive build",
+    "agent:pay": "pnpm --filter @agentpay/agent-client pay",
     "dev:api": "pnpm --filter @agentpay/api dev",
     "test": "pnpm --recursive test",
     "typecheck": "pnpm --filter @agentpay/config build && pnpm --recursive typecheck",

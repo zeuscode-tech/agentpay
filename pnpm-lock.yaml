@@ -21,6 +21,21 @@ importers:
         specifier: ^5.0.5
         version: 5.0.5(@types/node@26.6.5)(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(tsx@4.23.15))
 
+  apps/agent-client:
+    dependencies:
+      '@agentpay/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@solana/kit':
+        specifier: ^8.5.0
+        version: 8.5.0(typescript@7.0.2)
+      '@x402/fetch':
+        specifier: ^2.28.0
+        version: 2.28.0
+      '@x402/svm':
+        specifier: ^2.28.0
+        version: 2.28.0(@solana/kit@8.5.0(typescript@7.0.2))(@solana/sysvars@5.5.1(typescript@7.0.2))(typescript@7.0.2)
+
   apps/api:
     dependencies:
       '@agentpay/config':
@@ -1361,6 +1376,9 @@ packages:
 
   '@x402/extensions@2.28.0':
     resolution: {integrity: sha512-M3SVxO8DJnx7gpok/ODQp803jr21s1XrCMholNw0hSgOVvSPRksfTZ+CUNfJwteNaHmaAxGjPelXWBhTCMD9oQ==}
+
+  '@x402/fetch@2.28.0':
+    resolution: {integrity: sha512-kF5IjZIz/izg2TD/Zav+SVj0jtC0zBDfE7WcKCnMZWIsZcLCyL2GgvwXCn7CCSsNjpQ/z3Rz4OqTCA4AaeKySQ==}
 
   '@x402/svm@2.28.0':
     resolution: {integrity: sha512-D6+MSi7GG9LP7Lld1/i+A+Rk9ZyET5MmZAZqAyxmIda42tW3mVZjn/RJjGQbQmTKe+lYk8KiKWbeaxoK/x/ArA==}
@@ -3244,6 +3262,10 @@ snapshots:
       - ethers
       - typescript
       - utf-8-validate
+
+  '@x402/fetch@2.28.0':
+    dependencies:
+      '@x402/core': 2.28.0
 
   '@x402/svm@2.28.0(@solana/kit@8.5.0(typescript@7.0.2))(@solana/sysvars@5.5.1(typescript@7.0.2))(typescript@7.0.2)':
     dependencies:

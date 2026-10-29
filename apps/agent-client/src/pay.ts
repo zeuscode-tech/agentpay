@@ -1,0 +1,79 @@
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
+
+import { createKeyPairSignerFromBytes } from "@solana/kit";
+import {
+  decodePaymentResponseHeader,
+  wrapFetchWithPayment,
+  x402Client,
+  x402HTTPClient,
+} from "@x402/fetch";
+import { ExactSvmScheme } from "@x402/svm/exact/client";
+
+import { DEVNET_USDC_MINT, SOLANA_NETWORK } from "@agentpay/config";
+
+const apiUrl =
+  process.env.AGENTPAY_API_URL ??
+  "http://127.0.0.1:4021/v1/protected/status";
+const expectedReceiver = process.env.SOLANA_PAY_TO;
+const payerKeypairPath =
+  process.env.PAYER_KEYPAIR_PATH ??
+  resolve(process.cwd(), "../../.local/wallets/payer-devnet.keypair.json");
+
+if (!expectedReceiver) {
+  throw new Error("SOLANA_PAY_TO is required");
+}
+
+const payerBytes = new Uint8Array(
+  JSON.parse(await readFile(payerKeypairPath, "utf8")),
+);
+const payer = await createKeyPairSignerFromBytes(payerBytes);
+
+const client = new x402Client()
+  .setSpendControls({ maxAmountPerPayment: "$0.01" })
+  .registerPolicy((_version, requirements) =>
+    requirements.filter(
+      requirement =>
+        requirement.scheme === "exact" &&
+        requirement.network === SOLANA_NETWORK &&
+        requirement.asset === DEVNET_USDC_MINT &&
+        requirement.payTo === expectedReceiver,
+    ),
+  )
+  .register(SOLANA_NETWORK, new ExactSvmScheme(payer));
+
+const httpClient = new x402HTTPClient(client);
+const fetchWithPayment = wrapFetchWithPayment(fetch, httpClient);
+
+console.log(`Payer: ${payer.address}`);
+console.log(`Requesting: ${apiUrl}`);
+
+const response = await fetchWithPayment(apiUrl);
+const body = await response.json();
+const encodedReceipt = response.headers.get("PAYMENT-RESPONSE");
+const receipt = encodedReceipt
+  ? decodePaymentResponseHeader(encodedReceipt)
+  : undefined;
+
+if (!response.ok) {
+  const paymentRequired =
+    response.status === 402
+      ? httpClient.getPaymentRequiredResponse(
+          name => response.headers.get(name),
+          body,
+        )
+      : undefined;
+
+  throw new Error(
+    `Paid request failed with HTTP ${response.status}: ${JSON.stringify({ body, receipt, paymentRequired })}`,
+  );
+}
+
+if (!receipt) {
+  throw new Error("Successful response did not include PAYMENT-RESPONSE");
+}
+
+console.log("Protected response:");
+console.log(JSON.stringify(body, null, 2));
+console.log("Payment receipt:");
+console.log(JSON.stringify(receipt, null, 2));

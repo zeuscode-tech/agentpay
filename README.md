@@ -73,6 +73,17 @@ valid payment.
 Disposable wallet files are stored under `.local/wallets` and are ignored by
 Git. Never use these development wallets on Mainnet.
 
+After funding the printed payer address with Devnet USDC, keep the API running
+and execute one payment-aware request from another terminal:
+
+```bash
+pnpm agent:pay
+```
+
+The client accepts only x402 V2 `exact` requirements for Solana Devnet, the
+official Devnet USDC mint, the configured receiver, and a maximum of `0.01
+USDC` per request.
+
 ## Security
 
 Never commit wallet private keys, seed phrases, API keys, or populated `.env` files. Development uses disposable Devnet-only wallets.
