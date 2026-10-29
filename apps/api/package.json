@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "dev": "tsx watch --env-file-if-exists=../../.env src/server.ts",
-    "start": "node --env-file-if-exists=../../.env dist/src/server.js",
+    "dev": "tsx watch --env-file-if-exists=../../.env server.ts",
+    "start": "node --env-file-if-exists=../../.env dist/server.js",
     "test": "vitest run",
     "token:mint-dev": "tsx scripts/setup-devnet-test-token.ts",
     "tokens:setup": "tsx scripts/setup-devnet-token-accounts.ts",

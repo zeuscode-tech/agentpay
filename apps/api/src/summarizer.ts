@@ -114,27 +114,34 @@ class LocalSummarizer implements Summarizer {
 }
 
 class GatewaySummarizer implements Summarizer {
+  private readonly fallback = new LocalSummarizer();
+
   constructor(private readonly model: string) {}
 
   async summarize(request: SummaryRequest): Promise<SummaryResult> {
-    const { text } = await generateText({
-      model: this.model,
-      instructions:
-        "Summarize the supplied text accurately and concisely. Preserve the " +
-        "source language. Return only the summary without a title or preamble.",
-      prompt:
-        `Use at most ${request.maxSentences} sentences.\n\n` + request.text,
-      maxOutputTokens: 320,
-      temperature: 0.2,
-      maxRetries: 1,
-      timeout: 20_000,
-    });
+    try {
+      const { text } = await generateText({
+        model: this.model,
+        instructions:
+          "Summarize the supplied text accurately and concisely. Preserve the " +
+          "source language. Return only the summary without a title or preamble.",
+        prompt:
+          `Use at most ${request.maxSentences} sentences.\n\n` + request.text,
+        maxOutputTokens: 320,
+        temperature: 0.2,
+        maxRetries: 1,
+        timeout: 20_000,
+      });
 
-    return {
-      summary: text.trim(),
-      provider: "vercel-ai-gateway",
-      model: this.model,
-    };
+      return {
+        summary: text.trim(),
+        provider: "vercel-ai-gateway",
+        model: this.model,
+      };
+    } catch (error) {
+      console.error("AI Gateway summarization failed; using local fallback", error);
+      return this.fallback.summarize(request);
+    }
   }
 }
 
@@ -148,12 +155,6 @@ export function createSummarizer(
   }
 
   if (mode === "gateway") {
-    if (!environment.AI_GATEWAY_API_KEY && !environment.VERCEL_OIDC_TOKEN) {
-      throw new Error(
-        "AI_SUMMARIZER_MODE=gateway requires AI_GATEWAY_API_KEY or VERCEL_OIDC_TOKEN",
-      );
-    }
-
     if (!environment.AI_GATEWAY_MODEL) {
       throw new Error(
         "AI_SUMMARIZER_MODE=gateway requires an AI_GATEWAY_MODEL from the live model catalog",

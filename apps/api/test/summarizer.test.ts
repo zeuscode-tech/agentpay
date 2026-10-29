@@ -31,17 +31,19 @@ describe("text summarizer", () => {
     );
   });
 
-  it("requires Gateway credentials in LLM mode", () => {
+  it("supports Vercel-managed Gateway authentication without a static key", () => {
     expect(() =>
-      createSummarizer({ AI_SUMMARIZER_MODE: "gateway" }),
-    ).toThrow("requires AI_GATEWAY_API_KEY or VERCEL_OIDC_TOKEN");
+      createSummarizer({
+        AI_SUMMARIZER_MODE: "gateway",
+        AI_GATEWAY_MODEL: "test/provider-model",
+      }),
+    ).not.toThrow();
   });
 
   it("requires an explicit current model in LLM mode", () => {
     expect(() =>
       createSummarizer({
         AI_SUMMARIZER_MODE: "gateway",
-        AI_GATEWAY_API_KEY: "test-key-not-used",
       }),
     ).toThrow("requires an AI_GATEWAY_MODEL from the live model catalog");
   });
