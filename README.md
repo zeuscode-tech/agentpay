@@ -91,6 +91,21 @@ The client accepts only x402 V2 `exact` requirements for Solana Devnet, the
 official Devnet USDC mint, the configured receiver, and a maximum of `0.01
 USDC` per request.
 
+### Devnet faucet fallback
+
+Circle's faucet may deny access based on its security or regional policy. For
+local end-to-end testing only, create a disposable SPL token and fund the payer:
+
+```bash
+pnpm token:mint-dev
+```
+
+Copy the printed mint into `PAYMENT_ASSET` and set `PAYMENT_AMOUNT=1000` in the
+local `.env`. The API and client then use that exact mint and amount while
+keeping strict network, recipient, asset, and amount checks. This token has no
+real value and is not a substitute for USDC; the production target remains
+official USDC.
+
 ## Security
 
 Never commit wallet private keys, seed phrases, API keys, or populated `.env` files. Development uses disposable Devnet-only wallets.

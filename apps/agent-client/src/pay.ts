@@ -16,6 +16,8 @@ const apiUrl =
   process.env.AGENTPAY_API_URL ??
   "http://127.0.0.1:4021/v1/protected/status";
 const expectedReceiver = process.env.SOLANA_PAY_TO;
+const expectedAsset = process.env.PAYMENT_ASSET ?? DEVNET_USDC_MINT;
+const expectedAmount = process.env.PAYMENT_AMOUNT ?? "1000";
 const payerKeypairPath =
   process.env.PAYER_KEYPAIR_PATH ??
   resolve(process.cwd(), "../../.local/wallets/payer-devnet.keypair.json");
@@ -30,13 +32,23 @@ const payerBytes = new Uint8Array(
 const payer = await createKeyPairSignerFromBytes(payerBytes);
 
 const client = new x402Client()
-  .setSpendControls({ maxAmountPerPayment: "$0.01" })
+  .setSpendControls({
+    maxAmountPerPayment: "$0.01",
+    allowedAssets: [
+      {
+        network: SOLANA_NETWORK,
+        asset: expectedAsset,
+        maxAmountPerPayment: expectedAmount,
+      },
+    ],
+  })
   .registerPolicy((_version, requirements) =>
     requirements.filter(
       requirement =>
         requirement.scheme === "exact" &&
         requirement.network === SOLANA_NETWORK &&
-        requirement.asset === DEVNET_USDC_MINT &&
+        requirement.asset === expectedAsset &&
+        requirement.amount === expectedAmount &&
         requirement.payTo === expectedReceiver,
     ),
   )

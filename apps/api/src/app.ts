@@ -12,6 +12,8 @@ import {
 export type PaymentConfig = {
   facilitatorUrl: string;
   payTo: string;
+  asset?: string;
+  amount?: string;
 };
 
 export function getHealthStatus() {
@@ -52,6 +54,11 @@ export function createApp(paymentConfig?: PaymentConfig): Express {
   });
 
   if (paymentConfig) {
+    const paymentAsset = paymentConfig.asset ?? DEVNET_USDC_MINT;
+    const paymentPrice =
+      paymentConfig.asset && paymentConfig.amount
+        ? { asset: paymentConfig.asset, amount: paymentConfig.amount }
+        : DEFAULT_PRICE_USD;
     const facilitator = new HTTPFacilitatorClient({
       url: paymentConfig.facilitatorUrl,
     });
@@ -67,7 +74,7 @@ export function createApp(paymentConfig?: PaymentConfig): Express {
             accepts: [
               {
                 scheme: "exact",
-                price: DEFAULT_PRICE_USD,
+                price: paymentPrice,
                 network: SOLANA_NETWORK,
                 payTo: paymentConfig.payTo,
               },
@@ -86,7 +93,7 @@ export function createApp(paymentConfig?: PaymentConfig): Express {
         access: "paid",
         protocol: "x402-v2",
         network: SOLANA_NETWORK,
-        asset: DEVNET_USDC_MINT,
+        asset: paymentAsset,
       });
     });
   }
