@@ -8,12 +8,15 @@
     "dev": "tsx watch --env-file-if-exists=../../.env src/server.ts",
     "start": "node --env-file-if-exists=../../.env dist/src/server.js",
     "test": "vitest run",
+    "tokens:setup": "tsx scripts/setup-devnet-token-accounts.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "wallets:setup": "tsx scripts/setup-dev-wallets.ts"
   },
   "dependencies": {
     "@agentpay/config": "workspace:*",
     "@solana/kit": "^8.5.0",
+    "@solana/spl-token": "^0.4.15",
+    "@solana/web3.js": "^1.99.0",
     "@x402/core": "^2.28.0",
     "@x402/express": "^2.28.0",
     "@x402/svm": "^2.28.0",

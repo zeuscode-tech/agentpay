@@ -13,6 +13,7 @@
     "agent:pay": "pnpm --filter @agentpay/agent-client pay",
     "dev:api": "pnpm --filter @agentpay/api dev",
     "test": "pnpm --recursive test",
+    "tokens:setup": "pnpm --filter @agentpay/api tokens:setup",
     "typecheck": "pnpm --filter @agentpay/config build && pnpm --recursive typecheck",
     "wallets:setup": "pnpm --filter @agentpay/api wallets:setup"
   },

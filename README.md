@@ -73,6 +73,13 @@ valid payment.
 Disposable wallet files are stored under `.local/wallets` and are ignored by
 Git. Never use these development wallets on Mainnet.
 
+After funding both wallets with Devnet SOL, create their official Devnet USDC
+associated token accounts:
+
+```bash
+pnpm tokens:setup
+```
+
 After funding the printed payer address with Devnet USDC, keep the API running
 and execute one payment-aware request from another terminal:
 
