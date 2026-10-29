@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+dist/
+build/
+coverage/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Wallets and keypairs
+*.keypair.json
+*-keypair.json
+wallet.json
+
+# Runtime data
+*.db
+*.db-shm
+*.db-wal
+logs/
+
+# Editors and operating systems
+.DS_Store
+.idea/
+.vscode/
+
+# Package manager
+.pnpm-store/
+npm-debug.log*
+pnpm-debug.log*
