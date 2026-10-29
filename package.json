@@ -1,0 +1,23 @@
+{
+  "name": "agentpay",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pay-per-request AI tools for developers and autonomous agents using x402 and Solana.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "build": "pnpm --recursive build",
+    "dev:api": "pnpm --filter @agentpay/api dev",
+    "test": "pnpm --recursive test",
+    "typecheck": "pnpm --filter @agentpay/config build && pnpm --recursive typecheck"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}

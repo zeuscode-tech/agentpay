@@ -26,6 +26,29 @@ Early development for Solana Hackathon 2026 by Encode Club.
 - Solana Devnet
 - USDC
 
+## Development
+
+Requirements:
+
+- Node.js 22.13 or newer
+- pnpm 11
+
+Install dependencies and verify the workspace:
+
+```bash
+pnpm install
+pnpm typecheck
+pnpm test
+```
+
+Start the API:
+
+```bash
+pnpm dev:api
+```
+
+The initial health endpoint is available at `http://127.0.0.1:4021/health`.
+
 ## Security
 
 Never commit wallet private keys, seed phrases, API keys, or populated `.env` files. Development uses disposable Devnet-only wallets.
