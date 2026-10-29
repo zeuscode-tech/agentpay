@@ -27,7 +27,7 @@ facilitator settled the transaction, and the protected API returned HTTP `200`.
 - [x] Wallet-enabled web interface
 - [x] Payment receipt and Solana Explorer link
 - [x] Local request history in the browser
-- [x] Vercel AI Gateway summarizer with deterministic local fallback
+- [x] Vercel AI Gateway integration with deterministic local fallback
 - [x] Public Vercel deployment
 - [ ] Final demo video and hackathon submission
 
@@ -158,6 +158,9 @@ complete payment flow works without an external AI key. Set
 Vercel deployments can authenticate through OIDC; local development may use an
 `AI_GATEWAY_API_KEY`. If the gateway is unavailable, the API returns the local
 summary instead of losing an already-paid request. Never commit credentials.
+The public demo currently runs in `local` mode because Vercel requires billing
+verification before enabling Gateway requests; the Gateway integration remains
+ready to enable after that account step.
 
 ### Devnet faucet fallback
 

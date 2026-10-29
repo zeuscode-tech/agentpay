@@ -51,7 +51,7 @@ Solana Devnet.
 - Express protected API
 - x402 V2 exact-payment middleware and facilitator
 - Solana Devnet settlement
-- Vercel AI Gateway summarizer with a deterministic local fallback
+- Vercel AI Gateway integration with a deterministic local fallback
 - Vercel deployments for the web application and API
 
 The client uses an allowlist policy and refuses payment requirements that do not
@@ -77,6 +77,9 @@ real value. The payment code also supports the official Devnet USDC mint, and
 switching assets is an environment configuration change rather than a code
 change. The command-line agent flow has been verified end to end; browser-wallet
 testing requires funding the selected Devnet wallet with the same test token.
+The public API currently uses the deterministic local summarizer because Vercel
+requires billing verification before it will serve Gateway model requests. The
+Gateway path is implemented and can be enabled after that account-level step.
 
 ## Work remaining before final submission
 
