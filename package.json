@@ -9,7 +9,7 @@
   },
   "packageManager": "pnpm@11.25.0",
   "scripts": {
-    "build": "pnpm --recursive build",
+    "build": "pnpm --filter @agentpay/config build && pnpm --filter @agentpay/api build:local && pnpm --filter @agentpay/agent-client build && pnpm --filter @agentpay/web build",
     "agent:pay": "pnpm --filter @agentpay/agent-client pay",
     "dev:api": "pnpm --filter @agentpay/api dev",
     "dev:web": "pnpm --filter @agentpay/web dev",
