@@ -1,24 +1,56 @@
 # AgentPay
 
-AgentPay is a pay-per-request AI tools platform for developers and autonomous agents, powered by x402 and Solana.
+AgentPay is a pay-per-request AI tools platform for developers and autonomous
+agents, powered by x402 and Solana.
 
 The hackathon MVP focuses on one complete flow: a client requests a text
 summarization resource, receives an HTTP `402 Payment Required` challenge,
 settles a token payment on Solana Devnet, and receives the protected result only
 after successful payment verification.
 
-## Status
+## Live demo
 
-Early development for Solana Hackathon 2026 by Encode Club.
+- Web app: [agentpay-web-eta.vercel.app](https://agentpay-web-eta.vercel.app)
+- API health: [agentpay-api-kappa.vercel.app/health](https://agentpay-api-kappa.vercel.app/health)
+- Verified Devnet payment: [view on Solana Explorer](https://explorer.solana.com/tx/2bFzGnFw7WiDNWqhSA89TLYzYx8wq7xK84YTx17NSkW3fRLamPA742kBrJCwMJfyJqxrmwQtVPf9PZb9nzocC5YH?cluster=devnet)
 
-## Planned MVP
+The deployed flow was verified end to end on October 29, 2026: the client
+received an HTTP `402`, paid `0.001` of the configured Devnet test token, the
+facilitator settled the transaction, and the protected API returned HTTP `200`.
 
-- x402 V2 protected AI summarization API
-- Solana Devnet USDC payments
-- Payment-aware TypeScript agent client
-- Payment receipt and Solana Explorer link
-- Minimal web interface and request history
-- Failure handling for invalid, expired, and replayed payments
+## MVP status
+
+- [x] x402 V2 protected AI summarization API
+- [x] Real Solana Devnet settlement and payment verification
+- [x] Strict client checks for network, asset, amount, and receiver
+- [x] Payment-aware TypeScript agent client
+- [x] Wallet-enabled web interface
+- [x] Payment receipt and Solana Explorer link
+- [x] Local request history in the browser
+- [x] Vercel AI Gateway summarizer with deterministic local fallback
+- [x] Public Vercel deployment
+- [ ] Final demo video and hackathon submission
+
+## How it works
+
+```text
+Browser or agent
+      |
+      | 1. POST /v1/tools/summarize
+      v
+AgentPay API -- 2. HTTP 402 + exact payment requirements
+      ^
+      | 3. Signed Solana payment
+      | 4. Facilitator verifies and settles on Devnet
+      |
+      +-- 5. Paid request is retried
+      +-- 6. AI summary + PAYMENT-RESPONSE receipt
+```
+
+The protected result is generated only after the x402 middleware verifies the
+payment. Invalid input is rejected before a payment challenge is issued, and
+the client refuses requirements that change the expected Devnet network, token,
+amount, or receiver.
 
 ## Technology
 
@@ -27,7 +59,8 @@ Early development for Solana Hackathon 2026 by Encode Club.
 - Express
 - x402 V2
 - Solana Devnet
-- USDC
+- Vercel AI Gateway
+- Vercel
 
 ## Development
 
@@ -52,6 +85,17 @@ pnpm dev:api
 
 The health endpoint is available at `http://127.0.0.1:4021/health`. The paid
 summarizer is exposed as `POST http://127.0.0.1:4021/v1/tools/summarize`.
+
+Create `.env` from `.env.example` and configure at least:
+
+```dotenv
+FACILITATOR_URL=https://x402.org/facilitator
+SOLANA_PAY_TO=<receiver-wallet-address>
+```
+
+By default the API requests `0.001` Devnet USDC. For the custom test-token
+fallback, also set `PAYMENT_ASSET` to the mint address and `PAYMENT_AMOUNT=1000`
+(atomic units for a six-decimal token).
 
 Start the web app in another terminal:
 
@@ -104,16 +148,16 @@ pnpm agent:pay
 ```
 
 The client accepts only x402 V2 `exact` requirements for Solana Devnet, the
-official Devnet USDC mint, the configured receiver, and a maximum of `0.01
-USDC` per request.
+configured asset, amount, and receiver. It also caps each payment at `$0.01`.
 
 The API validates summarizer input before issuing a payment challenge. This
 prevents malformed requests from being charged. In the default
-`AI_SUMMARIZER_MODE=local` mode it uses a deterministic extractive NLP model, so
-the complete payment flow works without an external AI key. Set
-`AI_SUMMARIZER_MODE=gateway` and provide `AI_GATEWAY_API_KEY` to use the model
-named by `AI_GATEWAY_MODEL` through Vercel AI Gateway instead. Never commit that
-key.
+`AI_SUMMARIZER_MODE=local` mode it uses a deterministic extractive model, so the
+complete payment flow works without an external AI key. Set
+`AI_SUMMARIZER_MODE=gateway` and `AI_GATEWAY_MODEL` to use Vercel AI Gateway.
+Vercel deployments can authenticate through OIDC; local development may use an
+`AI_GATEWAY_API_KEY`. If the gateway is unavailable, the API returns the local
+summary instead of losing an already-paid request. Never commit credentials.
 
 ### Devnet faucet fallback
 
@@ -127,12 +171,30 @@ pnpm token:mint-dev
 Copy the printed mint into `PAYMENT_ASSET` and set `PAYMENT_AMOUNT=1000` in the
 local `.env`. The API and client then use that exact mint and amount while
 keeping strict network, recipient, asset, and amount checks. This token has no
-real value and is not a substitute for USDC; the production target remains
-official USDC.
+real value and is not a substitute for USDC. The public hackathon deployment
+currently uses this fallback because the Circle faucet is unavailable in the
+development region; moving to official Devnet USDC requires only environment
+configuration, not a code change.
+
+## Production configuration
+
+The repository contains no wallet secrets or populated environment files. The
+public deployment expects these settings in Vercel:
+
+- API: `FACILITATOR_URL`, `SOLANA_PAY_TO`, `PAYMENT_ASSET`, `PAYMENT_AMOUNT`,
+  `AI_SUMMARIZER_MODE`, and `AI_GATEWAY_MODEL`
+- Web: `NEXT_PUBLIC_AGENTPAY_API_URL`, `NEXT_PUBLIC_SOLANA_PAY_TO`,
+  `NEXT_PUBLIC_PAYMENT_ASSET`, and `NEXT_PUBLIC_PAYMENT_AMOUNT`
+
+`NEXT_PUBLIC_*` values are intentionally public payment metadata. Private keys,
+seed phrases, and payer wallet files must never be added to Vercel or Git.
 
 ## Security
 
-Never commit wallet private keys, seed phrases, API keys, or populated `.env` files. Development uses disposable Devnet-only wallets.
+Never commit wallet private keys, seed phrases, API keys, or populated `.env`
+files. Development uses disposable Devnet-only wallets. The agent client applies
+an allowlist policy before signing, and the server validates request bodies
+before asking for payment.
 
 ## License
 
