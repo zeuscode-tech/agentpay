@@ -72,6 +72,9 @@ importers:
       '@types/express':
         specifier: ^5.0.6
         version: 5.0.6
+      '@types/node':
+        specifier: ^26.6.5
+        version: 26.6.5
 
   apps/web:
     dependencies:
