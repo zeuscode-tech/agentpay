@@ -13,6 +13,9 @@ after successful payment verification.
 - Web app: [agentpay-web-eta.vercel.app](https://agentpay-web-eta.vercel.app)
 - API health: [agentpay-api-kappa.vercel.app/health](https://agentpay-api-kappa.vercel.app/health)
 - Verified Devnet payment: [view on Solana Explorer](https://explorer.solana.com/tx/2bFzGnFw7WiDNWqhSA89TLYzYx8wq7xK84YTx17NSkW3fRLamPA742kBrJCwMJfyJqxrmwQtVPf9PZb9nzocC5YH?cluster=devnet)
+- [Mid-submission draft](docs/MID_SUBMISSION.md)
+- [3-minute demo script](docs/DEMO_SCRIPT.md)
+- [Final submission draft](docs/FINAL_SUBMISSION.md)
 
 The deployed flow was verified end to end on October 29, 2026: the client
 received an HTTP `402`, paid `0.001` of the configured Devnet test token, the
