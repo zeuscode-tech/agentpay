@@ -50,7 +50,8 @@ AgentPay API -- 2. HTTP 402 + exact payment requirements
 The protected result is generated only after the x402 middleware verifies the
 payment. Invalid input is rejected before a payment challenge is issued, and
 the client refuses requirements that change the expected Devnet network, token,
-amount, or receiver.
+amount, or receiver. Automated boundary tests confirm that invalid input never
+reaches the payment middleware and an unpaid request never executes the AI tool.
 
 ## Technology
 

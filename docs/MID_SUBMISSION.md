@@ -84,7 +84,8 @@ Gateway path is implemented and can be enabled after that account-level step.
 ## Work remaining before final submission
 
 1. Fund a dedicated browser demo wallet and record the complete wallet flow.
-2. Expand negative-path tests for rejected, replayed, and expired payments.
+2. Add protocol-level replay and expiry tests; invalid-input and unpaid-request
+   boundaries are already covered automatically.
 3. Add clearer in-product progress and recovery messages for wallet failures.
 4. Run a final cross-browser and mobile-layout verification pass.
 5. Record a 2–4 minute English demo video.
