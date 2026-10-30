@@ -44,11 +44,15 @@ export function createApp(
     response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader(
       "Access-Control-Expose-Headers",
-      "PAYMENT-REQUIRED, PAYMENT-RESPONSE",
+      "PAYMENT-REQUIRED, PAYMENT-RESPONSE, X-PAYMENT-RESPONSE",
     );
     response.setHeader(
       "Access-Control-Allow-Headers",
-      "Content-Type, PAYMENT-SIGNATURE",
+      "Content-Type, PAYMENT-SIGNATURE, X-PAYMENT, Access-Control-Expose-Headers",
+    );
+    response.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, OPTIONS",
     );
 
     if (request.method === "OPTIONS") {

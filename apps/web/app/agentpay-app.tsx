@@ -9,6 +9,10 @@ import {
   getPaymentErrorCopy,
   type PaymentErrorCopy,
 } from "./payment-error";
+import {
+  buildSvmPaymentRequirements,
+  selectSvmTransactionVersion,
+} from "./transaction-version";
 
 type PaymentReceipt = {
   success: boolean;
@@ -59,7 +63,12 @@ function explorerUrl(signature: string) {
 }
 
 export function AgentPayApp() {
-  const { connected, signer, address } = useWallet();
+  const {
+    connected,
+    signer,
+    address,
+    supportedTransactionVersions,
+  } = useWallet();
   const [text, setText] = useState(defaultText);
   const [maxSentences, setMaxSentences] = useState(2);
   const [status, setStatus] = useState<
@@ -111,6 +120,19 @@ export function AgentPayApp() {
       return;
     }
 
+    const transactionVersion = selectSvmTransactionVersion(
+      supportedTransactionVersions,
+    );
+    if (transactionVersion === null) {
+      setStatus("error");
+      setError({
+        title: "Wallet transaction version unsupported",
+        message:
+          "This wallet cannot sign the Solana transaction versions supported by AgentPay.",
+      });
+      return;
+    }
+
     setStatus("paying");
 
     try {
@@ -125,6 +147,19 @@ export function AgentPayApp() {
         x402HTTPClient,
       } = x402Fetch;
       const { ExactSvmScheme } = x402Svm;
+      const svmScheme = new ExactSvmScheme(signer);
+      const walletCompatibleSvmScheme = {
+        scheme: svmScheme.scheme,
+        findDefaultAsset: svmScheme.findDefaultAsset,
+        createPaymentPayload: (
+          x402Version: Parameters<typeof svmScheme.createPaymentPayload>[0],
+          requirements: Parameters<typeof svmScheme.createPaymentPayload>[1],
+        ) =>
+          svmScheme.createPaymentPayload(
+            x402Version,
+            buildSvmPaymentRequirements(requirements, transactionVersion),
+          ),
+      };
       const paymentClient = new x402Client()
         .setSpendControls({
           maxAmountPerPayment: "$0.01",
@@ -146,7 +181,7 @@ export function AgentPayApp() {
               requirement.payTo === expectedReceiver,
           ),
         )
-        .register(SOLANA_NETWORK, new ExactSvmScheme(signer));
+        .register(SOLANA_NETWORK, walletCompatibleSvmScheme);
 
       const httpClient = new x402HTTPClient(paymentClient);
       const paidFetch = wrapFetchWithPayment(fetch, httpClient);
@@ -186,6 +221,7 @@ export function AgentPayApp() {
       window.localStorage.setItem(historyKey, JSON.stringify(nextHistory));
       setStatus("success");
     } catch (requestError) {
+      console.error("AgentPay paid request failed", requestError);
       setStatus("error");
       setError(getPaymentErrorCopy(requestError));
     }

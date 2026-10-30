@@ -77,6 +77,32 @@ describe("payment boundary", () => {
     paymentGate.mockClear();
   });
 
+  it("allows browser preflight for paid POST requests", async () => {
+    const summarize = vi.fn<Summarizer["summarize"]>();
+    const response = await request(createApp(paymentConfig, { summarize }), {
+      method: "OPTIONS",
+      headers: {
+        origin: "https://agentpay.example.test",
+        "access-control-request-method": "POST",
+        "access-control-request-headers": "content-type,payment-signature",
+      },
+    });
+
+    expect(response.status).toBe(204);
+    expect(response.headers.get("access-control-allow-origin")).toBe("*");
+    expect(response.headers.get("access-control-allow-methods")).toContain(
+      "POST",
+    );
+    expect(response.headers.get("access-control-allow-headers")).toContain(
+      "PAYMENT-SIGNATURE",
+    );
+    expect(response.headers.get("access-control-allow-headers")).toContain(
+      "Access-Control-Expose-Headers",
+    );
+    expect(paymentGate).not.toHaveBeenCalled();
+    expect(summarize).not.toHaveBeenCalled();
+  });
+
   it("rejects invalid input before issuing a payment requirement", async () => {
     const summarize = vi.fn<Summarizer["summarize"]>();
     const response = await request(createApp(paymentConfig, { summarize }), {
