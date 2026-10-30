@@ -17,6 +17,7 @@
     "token:mint-dev": "pnpm --filter @agentpay/api token:mint-dev",
     "tokens:setup": "pnpm --filter @agentpay/api tokens:setup",
     "typecheck": "pnpm --filter @agentpay/config build && pnpm --recursive typecheck",
+    "wallet:fund-demo": "pnpm --filter @agentpay/api wallet:fund-demo",
     "wallets:setup": "pnpm --filter @agentpay/api wallets:setup"
   },
   "devDependencies": {

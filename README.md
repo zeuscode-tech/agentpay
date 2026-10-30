@@ -180,6 +180,17 @@ currently uses this fallback because the Circle faucet is unavailable in the
 development region; moving to official Devnet USDC requires only environment
 configuration, not a code change.
 
+To fund a browser demo wallet with one unit of this disposable token, provide
+only its public Devnet address:
+
+```bash
+DEVNET_WALLET_ADDRESS=<public-wallet-address> pnpm wallet:fund-demo
+```
+
+The command creates the wallet's associated token account when needed and
+prints the finalized transaction link. Never provide a seed phrase or private
+key. `DEVNET_TOKEN_AMOUNT` can override the default `1000000` atomic units.
+
 ## Production configuration
 
 The repository contains no wallet secrets or populated environment files. The

@@ -11,6 +11,7 @@
     "token:mint-dev": "tsx scripts/setup-devnet-test-token.ts",
     "tokens:setup": "tsx scripts/setup-devnet-token-accounts.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "wallet:fund-demo": "tsx --env-file-if-exists=../../.env scripts/fund-demo-wallet.ts",
     "wallets:setup": "tsx scripts/setup-dev-wallets.ts"
   },
   "dependencies": {
