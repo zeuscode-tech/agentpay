@@ -5,6 +5,11 @@ import { WalletMultiButton, useWallet } from "@solana/wallet-adapter";
 
 import { DEVNET_USDC_MINT, SOLANA_NETWORK } from "@agentpay/config";
 
+import {
+  getPaymentErrorCopy,
+  type PaymentErrorCopy,
+} from "./payment-error";
+
 type PaymentReceipt = {
   success: boolean;
   payer?: string;
@@ -62,7 +67,7 @@ export function AgentPayApp() {
   >("idle");
   const [result, setResult] = useState<SummaryResponse | null>(null);
   const [receipt, setReceipt] = useState<PaymentReceipt | null>(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<PaymentErrorCopy | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
 
   useEffect(() => {
@@ -83,19 +88,26 @@ export function AgentPayApp() {
 
   async function runSummarizer(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError("");
+    setError(null);
     setResult(null);
     setReceipt(null);
 
     if (!connected || !signer) {
       setStatus("error");
-      setError("Connect a Solana wallet that can sign transactions first.");
+      setError({
+        title: "Connect a wallet",
+        message:
+          "Connect a Solana Devnet wallet that can sign transactions first.",
+      });
       return;
     }
 
     if (!expectedReceiver) {
       setStatus("error");
-      setError("NEXT_PUBLIC_SOLANA_PAY_TO is not configured.");
+      setError({
+        title: "Demo configuration incomplete",
+        message: "The payment receiver is not configured for this deployment.",
+      });
       return;
     }
 
@@ -175,11 +187,7 @@ export function AgentPayApp() {
       setStatus("success");
     } catch (requestError) {
       setStatus("error");
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "The paid request failed.",
-      );
+      setError(getPaymentErrorCopy(requestError));
     }
   }
 
@@ -331,10 +339,10 @@ export function AgentPayApp() {
                 <p>The result unlocks after x402 verifies the payment.</p>
               </div>
             )}
-            {status === "error" && (
+            {status === "error" && error && (
               <div className="error-result">
                 <span>!</span>
-                <div><strong>Request not completed</strong><p>{error}</p></div>
+                <div><strong>{error.title}</strong><p>{error.message}</p></div>
               </div>
             )}
             {status === "success" && result && receipt && (
